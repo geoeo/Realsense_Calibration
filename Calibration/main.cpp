@@ -25,6 +25,7 @@ float squareSize = 29.0; // in mm
 // inner points per row, inner points per column
 Size boardSize = Size(7,5);
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
+int calibrationFlags = CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO;
 
 int main()
 {
@@ -40,7 +41,6 @@ int main()
     //Wrap intrinsic paramters into openCV readable containers
     Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
     Mat cameraMatrix = Mat::zeros(3, 3, CV_64F);
-    Mat extrinsicMatrix = Mat::zeros(4, 3, CV_64F);
     // Vector for image series
     vector<Mat> rvecs, tvecs;
     // vector of 3D feature points per image
@@ -97,16 +97,32 @@ int main()
         Mat view(Size(image_width, image_height), CV_8UC3, (void*)dev->get_frame_data(rs::stream::color), Mat::AUTO_STEP);
         
         char keyPressed = (char)waitKey(1);
-        cout << "Key pressed: " << (int)keyPressed << "\n";
+        //cout << "Key pressed: " << (int)keyPressed << "\n";
         
-        //imshow("Display Image", view);
         // Enter
         if(keyPressed == 13){
+            dev->stop();
+            ctx.~context();
+            
             cout << "Enter pressed..\n";
+            cout << "Processing Image Sections for Calibration..\n";
+            capturing = false;
+            
+            // duplicate the object points (3D) for every 2D feature space
+            objectPoints.assign(imagePoints.size(), corners);
+            // run calibration over feature sequences
+            calibrateCamera(objectPoints, imagePoints, Size(image_width,image_height), cameraMatrix, distCoeffs, rvecs, tvecs);
+            
+            cout << "Successfully Calibrated the Camera!\n";
+            // Write to File
+            
+            break;
+            
         }
         
         // ESC pressed
         else if(keyPressed == 27){
+            cout << "Exiting..\n";
             dev->stop();
             ctx.~context();
             break;
@@ -115,10 +131,9 @@ int main()
         // c pressed
         else if(capturing || keyPressed == 'c'){
             
-            //if(!capturing)
-                //capturing = true;
             if(keyPressed == 'c')
                 capturing = !capturing;
+        
             bool found = findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags);
             
             if(found){
@@ -133,6 +148,7 @@ int main()
                 imshow("Display Image", view);
                 
                 imagePoints.push_back(pointBuf);
+                cout << "Images Captued: "<< imagePoints.size() << "\n";
                 
             }
             else {
