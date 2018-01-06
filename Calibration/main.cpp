@@ -6,32 +6,6 @@
 //  Copyright © 2018 Marc Haubenstock. All rights reserved.
 //
 
-//#include <iostream>
-//#include <opencv2/opencv.hpp>
-//#include <opencv2/videoio.hpp>
-//
-//
-//using namespace std;
-//using namespace cv;
-//
-//int main(){
-//
-//
-//    VideoCapture cap(0);
-//    Mat new_frame;
-//    while(true){
-//        cap >> new_frame;
-//        if(new_frame.empty()){
-//            break;
-//        }
-//        imshow("camera", new_frame);
-//        // press ESC to quit software
-//        if( (int)waitKey(10) == 27 ){
-//            break;
-//        }
-//    }
-//}
-
 //https://github.com/IntelRealSense/librealsense/blob/legacy/doc/stepbystep/getting_started_with_openCV.md
 
 // include the librealsense C++ header file
@@ -39,6 +13,7 @@
 
 // include OpenCV header file
 #include <opencv2/opencv.hpp>
+#include <opencv2/calib3d.hpp>
 
 using namespace std;
 using namespace cv;
@@ -57,6 +32,12 @@ int main()
     // Start streaming
     dev->start();
     
+    // vector of 2D features
+    vector<Point2f> pointBuf;
+    
+    // inner points per row, inner points per column
+    Size boardSize = Size(7,5);
+    
     // Camera warmup - Dropped several first frames to let auto-exposure stabilize
     for(int i = 0; i < 30; i++)
         dev->wait_for_frames();
@@ -67,15 +48,37 @@ int main()
     while(true){
         
         // Creating OpenCV Matrix from a color image
-        Mat color(Size(640, 480), CV_8UC3, (void*)dev->get_frame_data(rs::stream::color), Mat::AUTO_STEP);
+        Mat view(Size(640, 480), CV_8UC3, (void*)dev->get_frame_data(rs::stream::color), Mat::AUTO_STEP);
         
-        imshow("Display Image", color);
-        dev->wait_for_frames();
+        //imshow("Display Image", view);
         
+        int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
+        bool found = findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags);
+        
+        if(found){
+            Mat viewGray;
+            // Convert image to grey scale
+            cvtColor(view, viewGray, COLOR_BGR2GRAY);
+            // Use sub pixel interpolation to find more accurate corener estimates
+            cornerSubPix( viewGray, pointBuf, Size(11,11),
+                         Size(-1,-1), TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1 ));
+            // draw corners (Pointbuf) into image
+            drawChessboardCorners( view, boardSize, Mat(pointBuf), found );
+            imshow("Display Image", view);
+        }
+        else {
+            imshow("Display Image", view);
+        }
+        
+        
+        // ESC pressed
         if((char)waitKey(1) == 27){
-            // ESC pressed
+            dev->stop();
+            ctx.~context();
             break;
         }
+        
+        dev->wait_for_frames();
         
     }
     
