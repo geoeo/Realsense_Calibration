@@ -16,19 +16,24 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d.hpp>
 
+#include "writer.hpp"
+
 using namespace std;
 using namespace cv;
 
 float image_width = 640;
 float image_height = 480;
 float squareSize = 29.0; // in mm
+//float squareSize = 1.0; // in mm
 // inner points per row, inner points per column
 Size boardSize = Size(7,5);
+Size imageSize = Size(image_width,image_height);
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
-int calibrationFlags = CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO;
+int calibrationFlags = CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO; // | CV_CALIB_FIX_FOCAL_LENGTH;
 
 int main()
 {
+    
     // Create a context object. This object owns the handles to all connected realsense devices
     rs::context ctx;
     
@@ -40,7 +45,8 @@ int main()
     
     //Wrap intrinsic paramters into openCV readable containers
     Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
-    Mat cameraMatrix = Mat::zeros(3, 3, CV_64F);
+    Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
+    //Mat cameraMatrix = Mat::zeros(3, 3, CV_32F);
     // Vector for image series
     vector<Mat> rvecs, tvecs;
     // vector of 3D feature points per image
@@ -55,17 +61,16 @@ int main()
     cout << "fx:" << intrinsics.fx << " fy:" << intrinsics.fy << "\n";
     cout << "ppx:" << intrinsics.ppx << " ppy:" << intrinsics.ppy << "\n";
     
-    cameraMatrix.at<float>(0, 0) = intrinsics.fx;
-    cameraMatrix.at<float>(1, 1) = intrinsics.fy;
-    cameraMatrix.at<float>(2, 2) = 1.0;
-    cameraMatrix.at<float>(0, 2) = intrinsics.ppx;
-    cameraMatrix.at<float>(1, 2) = intrinsics.ppy;
+    cameraMatrix.at<double>(0, 0) = intrinsics.fx;
+    cameraMatrix.at<double>(1, 1) = intrinsics.fy;
+    cameraMatrix.at<double>(0, 2) = intrinsics.ppx;
+    cameraMatrix.at<double>(1, 2) = intrinsics.ppy;
     
     cout << "Distortion model:" << intrinsics.model << "\n";
     for (int i = 0; i < 5; i++) {
-        float coeff = intrinsics.coeffs[i];
+        double coeff = intrinsics.coeffs[i];
         cout << "Distortion Coeff " << i << ":" << coeff << "\n";
-        distCoeffs.at<float>(i,0) = coeff;
+        distCoeffs.at<double>(i,0) = coeff;
     }
     
     
@@ -110,11 +115,13 @@ int main()
             
             // duplicate the object points (3D) for every 2D feature space
             objectPoints.assign(imagePoints.size(), corners);
+            
             // run calibration over feature sequences
-            calibrateCamera(objectPoints, imagePoints, Size(image_width,image_height), cameraMatrix, distCoeffs, rvecs, tvecs);
+            calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
             
             cout << "Successfully Calibrated the Camera!\n";
             // Write to File
+            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize);
             
             break;
             
