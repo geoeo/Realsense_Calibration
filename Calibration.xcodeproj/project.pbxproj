@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		364A8FE71FFF99FF008DFD05 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 364A8FE61FFF99FF008DFD05 /* main.cpp */; };
-		3693168F20018B32005740CF /* writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3693168D20018B32005740CF /* writer.cpp */; };
+		3684207820025C8D00CD3554 /* calibration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3684207620025C8D00CD3554 /* calibration.cpp */; };
+		3693168F20018B32005740CF /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3693168D20018B32005740CF /* io.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,8 +27,10 @@
 /* Begin PBXFileReference section */
 		364A8FE31FFF99FF008DFD05 /* Calibration */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Calibration; sourceTree = BUILT_PRODUCTS_DIR; };
 		364A8FE61FFF99FF008DFD05 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		3693168D20018B32005740CF /* writer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = writer.cpp; sourceTree = "<group>"; };
-		3693168E20018B32005740CF /* writer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = writer.hpp; sourceTree = "<group>"; };
+		3684207620025C8D00CD3554 /* calibration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = calibration.cpp; sourceTree = "<group>"; };
+		3684207720025C8D00CD3554 /* calibration.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = calibration.hpp; sourceTree = "<group>"; };
+		3693168D20018B32005740CF /* io.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = io.cpp; sourceTree = "<group>"; };
+		3693168E20018B32005740CF /* io.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = io.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +63,11 @@
 		364A8FE51FFF99FF008DFD05 /* Calibration */ = {
 			isa = PBXGroup;
 			children = (
+				3684207620025C8D00CD3554 /* calibration.cpp */,
+				3684207720025C8D00CD3554 /* calibration.hpp */,
 				364A8FE61FFF99FF008DFD05 /* main.cpp */,
-				3693168D20018B32005740CF /* writer.cpp */,
-				3693168E20018B32005740CF /* writer.hpp */,
+				3693168D20018B32005740CF /* io.cpp */,
+				3693168E20018B32005740CF /* io.hpp */,
 			);
 			path = Calibration;
 			sourceTree = "<group>";
@@ -124,8 +129,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3693168F20018B32005740CF /* writer.cpp in Sources */,
+				3693168F20018B32005740CF /* io.cpp in Sources */,
 				364A8FE71FFF99FF008DFD05 /* main.cpp in Sources */,
+				3684207820025C8D00CD3554 /* calibration.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

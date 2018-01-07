@@ -1,12 +1,12 @@
 //
-//  writer.cpp
+//  io
 //  Calibration
 //
 //  Created by Marc Haubenstock on 06.01.18.
 //  Copyright © 2018 Marc Haubenstock. All rights reserved.
 //
 
-#include "writer.hpp"
+#include "io.hpp"
 
 bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize){
     bool success = true;
@@ -39,6 +39,60 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
     fs << tvec.at<float>(1, 0) << "\n";
     fs << tvec.at<float>(2, 0) << "\n";
     fs.close();
+    
+    return success;
+    
+}
+
+bool loadFilesInDirInto(vector<string> &imagePaths,string dirPath){
+    
+    bool success = true;
+    
+    DIR *dir;
+    struct dirent *ent;
+    if ((dir = opendir(dirPath.c_str())) != NULL) {
+        /* print all the files and directories within directory */
+        while ((ent = readdir (dir)) != NULL) {
+            
+            if(ent->d_name[0] != '.'){
+                string imagePath = dirPath + ent->d_name;
+                imagePaths.push_back(imagePath);
+            }
+
+        }
+        closedir (dir);
+    } else {
+        /* could not open directory */
+        perror ("");
+        success = false;
+    }
+    
+    return success;
+
+}
+
+bool loadImages(const vector<string> &imagePaths, vector<Mat>& images){
+    
+    bool success = true;
+    
+    for(string imagePath : imagePaths){
+        // Read the file
+        Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
+        
+        // Check for invalid input
+        if(!image.data )
+        {
+            cout <<  "Could not open or find the image" << std::endl ;
+            success = false;
+            break;
+        }
+        
+        images.push_back(image);
+        
+    }
+    
+
+    
     
     return success;
     
