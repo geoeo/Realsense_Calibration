@@ -23,7 +23,7 @@ int main()
     vector<Mat> images;
     vector<string> imagePaths;
     //string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images/";
-    string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Image_Seq_1/";
+    string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Image_Seq_2/";
     bool success = true;
 
     success = loadFilesInDirInto(imagePaths,dirPath);

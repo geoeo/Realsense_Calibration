@@ -18,7 +18,7 @@
 using namespace std;
 using namespace cv;
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize, const vector<string>& imagePaths, float rms);
+bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths, float rms);
 
 bool loadImages(const vector<string> &imagePaths,vector<Mat>& images);
 

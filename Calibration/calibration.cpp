@@ -44,7 +44,7 @@ bool calibrationFromStream(){
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
     //Mat cameraMatrix = Mat::zeros(3, 3, CV_32F);
     // Vector for image series
-    vector<Mat> rvecs, tvecs;
+    vector<Mat> rvecs, tvecs,tvecs_no_rot;
     // vector of 3D feature points per image
     vector<vector<Point3f>> objectPoints;
     // vector of 2D feature points per image
@@ -122,10 +122,12 @@ bool calibrationFromStream(){
             // run calibration over feature sequences
             rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
             
+            removeRotationFromTranslation(rvecs,tvecs,tvecs_no_rot);
+            
             cout << "Successfully Calibrated the Camera!\n";
             cout << "RMS: " << rms << std::endl;
             // Write to File
-            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,imagePaths,rms);
+            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs,tvecs_no_rot, imageSize,imagePaths,rms);
             
             break;
             
@@ -188,7 +190,7 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
     //Mat cameraMatrix = Mat::zeros(3, 3, CV_32F);
     // Vector for image series
-    vector<Mat> rvecs, tvecs;
+    vector<Mat> rvecs, tvecs, tvecs_no_rot;
     // vector of 3D feature points per image
     vector<vector<Point3f>> objectPoints;
     // vector of 2D feature points per image
@@ -224,6 +226,8 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     // Create a window for display.
     //namedWindow( "Display window", WINDOW_AUTOSIZE );
     
+    cout << "Starting Corner Detect" << endl;
+    
     for(Mat image : images){
 
         bool found = findChessboardCorners( image, boardSize, pointBuf, chessBoardFlags);
@@ -253,12 +257,40 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     // run calibration over feature sequences
     rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
     
+   
+    removeRotationFromTranslation(rvecs,tvecs,tvecs_no_rot);
+    
     cout << "Successfully Calibrated the Camera!\n";
     cout << "RMS: " << rms << std::endl;
     // Write to File
-    writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,imagePaths, rms);
+    writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs,tvecs_no_rot,imageSize,imagePaths, rms);
     
     
     
     return success;
+}
+
+// remove the rotation component from the translation
+// https://stackoverflow.com/questions/45458665/get-correct-rvec-and-tvec-for-camera-pose-estimation-from-solvpnp-function-in-op?rq=1
+void removeRotationFromTranslation(const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rotation){
+    
+
+    for (int i = 0; i < rvecs.size(); i++) {
+        Mat rotation_front;
+        Mat world_position_front_cam;
+        
+        //Get rotation matrix
+        Rodrigues(rvecs[i], rotation_front);
+        
+        //Get rotation matrix inverse
+        Mat rotation_inverse;
+        transpose(rotation_front, rotation_inverse);
+        
+        //Get camera position in world cordinates
+        world_position_front_cam = -rotation_inverse * tvecs[i];
+        tvecs_no_rotation.push_back(world_position_front_cam);
+        
+        //cout << "x: " << world_position_front_cam.at<double>(0,0) << " y:" << world_position_front_cam.at<double>(1,0) << " z: " << world_position_front_cam.at<double>(2,0) << endl;
+    }
+    
 }

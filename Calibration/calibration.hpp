@@ -23,5 +23,6 @@
 
 bool calibrationFromStream();
 bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths);
+void removeRotationFromTranslation(const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rotation);
 
 #endif /* calibration_hpp */

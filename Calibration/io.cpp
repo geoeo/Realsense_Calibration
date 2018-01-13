@@ -8,7 +8,7 @@
 
 #include "io.hpp"
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize, const vector<string>& imagePaths,float rms){
+bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths,float rms){
     bool success = true;
     
     fstream fs;
@@ -33,12 +33,24 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
     fs << rms << endl; // rms
     fs.close();
     
-    //TODO WRITE ALL
     fs.open("tvec.txt", fstream::in | fstream::out | fstream::trunc);
-    //Mat tvec = tvecs[0];
     // 3x1: x,y,z
     for(Mat tvec : tvecs){
-         fs << tvec.at<float>(0, 0) << "," << tvec.at<float>(1, 0) << "," << tvec.at<float>(2, 0) << endl;
+         fs << tvec.at<double>(0, 0) << "," << tvec.at<double>(1, 0) << "," << tvec.at<double>(2, 0) << endl;
+    }
+    fs.close();
+    
+    fs.open("tvec_no_rot.txt", fstream::in | fstream::out | fstream::trunc);
+    // 3x1: x,y,z
+    for(Mat tvec : tvecs_no_rot){
+        fs << tvec.at<double>(0, 0) << "," << tvec.at<double>(1, 0) << "," << tvec.at<double>(2, 0) << endl;
+    }
+    fs.close();
+    
+    fs.open("rvec.txt", fstream::in | fstream::out | fstream::trunc);
+    // 3x1: Rodriguiz format
+    for(Mat rvec : rvecs){
+        fs << rvec.at<double>(0, 0) << "," << rvec.at<double>(1, 0) << "," << rvec.at<double>(2, 0) << endl;
     }
     fs.close();
     
