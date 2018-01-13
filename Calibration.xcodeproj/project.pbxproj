@@ -10,10 +10,20 @@
 		364A8FE71FFF99FF008DFD05 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 364A8FE61FFF99FF008DFD05 /* main.cpp */; };
 		3684207820025C8D00CD3554 /* calibration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3684207620025C8D00CD3554 /* calibration.cpp */; };
 		3693168F20018B32005740CF /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3693168D20018B32005740CF /* io.cpp */; };
+		36B21B2F2009868200049371 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B21B2E2009868200049371 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		364A8FE11FFF99FF008DFD05 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		36B21B2A2009868200049371 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -31,10 +41,19 @@
 		3684207720025C8D00CD3554 /* calibration.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = calibration.hpp; sourceTree = "<group>"; };
 		3693168D20018B32005740CF /* io.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = io.cpp; sourceTree = "<group>"; };
 		3693168E20018B32005740CF /* io.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = io.hpp; sourceTree = "<group>"; };
+		36B21B2C2009868200049371 /* ImageCreation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ImageCreation; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B21B2E2009868200049371 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		364A8FE01FFF99FF008DFD05 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B21B292009868200049371 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -48,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				364A8FE51FFF99FF008DFD05 /* Calibration */,
+				36B21B2D2009868200049371 /* ImageCreation */,
 				364A8FE41FFF99FF008DFD05 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				364A8FE31FFF99FF008DFD05 /* Calibration */,
+				36B21B2C2009868200049371 /* ImageCreation */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +91,14 @@
 				3693168E20018B32005740CF /* io.hpp */,
 			);
 			path = Calibration;
+			sourceTree = "<group>";
+		};
+		36B21B2D2009868200049371 /* ImageCreation */ = {
+			isa = PBXGroup;
+			children = (
+				36B21B2E2009868200049371 /* main.cpp */,
+			);
+			path = ImageCreation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -92,6 +121,23 @@
 			productReference = 364A8FE31FFF99FF008DFD05 /* Calibration */;
 			productType = "com.apple.product-type.tool";
 		};
+		36B21B2B2009868200049371 /* ImageCreation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36B21B322009868200049371 /* Build configuration list for PBXNativeTarget "ImageCreation" */;
+			buildPhases = (
+				36B21B282009868200049371 /* Sources */,
+				36B21B292009868200049371 /* Frameworks */,
+				36B21B2A2009868200049371 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ImageCreation;
+			productName = ImageCreation;
+			productReference = 36B21B2C2009868200049371 /* ImageCreation */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -102,6 +148,10 @@
 				ORGANIZATIONNAME = "Marc Haubenstock";
 				TargetAttributes = {
 					364A8FE21FFF99FF008DFD05 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					36B21B2B2009868200049371 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
 					};
@@ -120,6 +170,7 @@
 			projectRoot = "";
 			targets = (
 				364A8FE21FFF99FF008DFD05 /* Calibration */,
+				36B21B2B2009868200049371 /* ImageCreation */,
 			);
 		};
 /* End PBXProject section */
@@ -132,6 +183,14 @@
 				3693168F20018B32005740CF /* io.cpp in Sources */,
 				364A8FE71FFF99FF008DFD05 /* main.cpp in Sources */,
 				3684207820025C8D00CD3554 /* calibration.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36B21B282009868200049371 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B21B2F2009868200049371 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,22 +327,6 @@
 					"-lopencv_video",
 					"-lopencv_videoio",
 					"-lopencv_videostab",
-					"-lopencv_calib3d",
-					"-lopencv_core",
-					"-lopencv_features2d",
-					"-lopencv_flann",
-					"-lopencv_highgui",
-					"-lopencv_imgcodecs",
-					"-lopencv_imgproc",
-					"-lopencv_ml",
-					"-lopencv_objdetect",
-					"-lopencv_photo",
-					"-lopencv_shape",
-					"-lopencv_stitching",
-					"-lopencv_superres",
-					"-lopencv_video",
-					"-lopencv_videoio",
-					"-lopencv_videostab",
 					"-lrealsense",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -317,22 +360,50 @@
 					"-lopencv_video",
 					"-lopencv_videoio",
 					"-lopencv_videostab",
-					"-lopencv_calib3d",
+					"-lrealsense",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		36B21B302009868200049371 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/usr/local/Cellar/opencv/3.4.0/lib,
+				);
+				OTHER_LDFLAGS = (
 					"-lopencv_core",
-					"-lopencv_features2d",
-					"-lopencv_flann",
 					"-lopencv_highgui",
-					"-lopencv_imgcodecs",
+					"-lopencv_calib3d",
 					"-lopencv_imgproc",
-					"-lopencv_ml",
-					"-lopencv_objdetect",
-					"-lopencv_photo",
-					"-lopencv_shape",
-					"-lopencv_stitching",
-					"-lopencv_superres",
-					"-lopencv_video",
-					"-lopencv_videoio",
-					"-lopencv_videostab",
+					"-lopencv_imgcodecs",
+					"-lrealsense",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		36B21B312009868200049371 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib,
+					/usr/local/Cellar/opencv/3.4.0/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lopencv_core",
+					"-lopencv_highgui",
+					"-lopencv_calib3d",
+					"-lopencv_imgproc",
+					"-lopencv_imgcodecs",
 					"-lrealsense",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -356,6 +427,15 @@
 			buildConfigurations = (
 				364A8FEB1FFF99FF008DFD05 /* Debug */,
 				364A8FEC1FFF99FF008DFD05 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36B21B322009868200049371 /* Build configuration list for PBXNativeTarget "ImageCreation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B21B302009868200049371 /* Debug */,
+				36B21B312009868200049371 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

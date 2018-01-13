@@ -8,7 +8,7 @@
 
 #include "io.hpp"
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize){
+bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize,float rms){
     bool success = true;
     
     fstream fs;
@@ -30,6 +30,7 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
     fs.open("dimensions.txt", fstream::in | fstream::out | fstream::trunc);
     fs << imageSize.width << "\n"; // width
     fs << imageSize.height << "\n"; // height
+    fs << rms << std::endl; // rms
     fs.close();
     
     //TODO WRITE ALL

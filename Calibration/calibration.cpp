@@ -23,6 +23,7 @@ Size boardSize = Size(7,5);
 Size imageSize = Size(image_width,image_height);
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int calibrationFlags = CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO; // | CV_CALIB_FIX_FOCAL_LENGTH;
+float rms = 0;
 
 bool calibrationFromStream(){
     bool success = true;
@@ -54,11 +55,16 @@ bool calibrationFromStream(){
     cout << "fx:" << intrinsics.fx << " fy:" << intrinsics.fy << "\n";
     cout << "ppx:" << intrinsics.ppx << " ppy:" << intrinsics.ppy << "\n";
     
-    cameraMatrix.at<double>(0, 0) = intrinsics.fx;
-    cameraMatrix.at<double>(1, 1) = intrinsics.fy;
-    cameraMatrix.at<double>(0, 2) = intrinsics.ppx;
-    cameraMatrix.at<double>(1, 2) = intrinsics.ppy;
+    cameraMatrix.at<double>(0, 0) = intrinsics.fx; // 610.367
+    cameraMatrix.at<double>(1, 1) = intrinsics.fy; // 615.825
+    cameraMatrix.at<double>(0, 2) = intrinsics.ppx; // 332.213
+    cameraMatrix.at<double>(1, 2) = intrinsics.ppy; // 225.817
     
+//    Distortion Coeff 0:-0.0658501
+//    Distortion Coeff 1:0.0744128
+//    Distortion Coeff 2:-0.000177425
+//    Distortion Coeff 3:-0.00126745
+//    Distortion Coeff 4:0
     cout << "Distortion model:" << intrinsics.model << "\n";
     for (int i = 0; i < 5; i++) {
         double coeff = intrinsics.coeffs[i];
@@ -110,11 +116,12 @@ bool calibrationFromStream(){
             objectPoints.assign(imagePoints.size(), corners);
             
             // run calibration over feature sequences
-            calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
+            rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
             
             cout << "Successfully Calibrated the Camera!\n";
+            cout << "RMS: " << rms << std::endl;
             // Write to File
-            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize);
+            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,rms);
             
             break;
             
@@ -172,16 +179,81 @@ bool calibrationFromStream(){
 bool calibrationFromImageSequence(const vector<Mat>& images){
     bool success = true;
     
+    //Wrap intrinsic paramters into openCV readable containers
+    Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
+    Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
+    //Mat cameraMatrix = Mat::zeros(3, 3, CV_32F);
+    // Vector for image series
+    vector<Mat> rvecs, tvecs;
+    // vector of 3D feature points per image
+    vector<vector<Point3f>> objectPoints;
+    // vector of 2D feature points per image
+    vector<vector<Point2f>> imagePoints;
+    
+    // defaults from camera
+    float fx = 610.367; float fy = 615.825;
+    float ppx = 332.213; float ppy = 225.817;
+
+    cameraMatrix.at<double>(0, 0) = fx;
+    cameraMatrix.at<double>(1, 1) = fy;
+    cameraMatrix.at<double>(0, 2) = ppx;
+    cameraMatrix.at<double>(1, 2) = ppy;
+    
+    distCoeffs.at<double>(0,0) = -0.0658501;
+    distCoeffs.at<double>(1,0) = 0.0744128;
+    distCoeffs.at<double>(2,0) = -0.000177425;
+    distCoeffs.at<double>(3,0) = -0.00126745;
+    distCoeffs.at<double>(4,0) = 0;
+
+    // vector of 2D features
+    vector<Point2f> pointBuf;
+    
+    // vector of features in 3D space
+    vector<Point3f> corners;
+    // Since location of corners wont change in 3D (assuming a static map) we can precompute them
+    for (int i = 0; i < boardSize.height; i++) {
+        for (int j = 0; j < boardSize.width; j++) {
+            corners.push_back(Point3f(j*squareSize, i*squareSize, 0));
+        }
+    }
+    
+    // Create a window for display.
+    namedWindow( "Display window", WINDOW_AUTOSIZE );
+    
     for(Mat image : images){
-        // Create a window for display.
-        namedWindow( "Display window", WINDOW_AUTOSIZE );
-        // Show our image inside it.
-        imshow( "Display window", image );
+
+        bool found = findChessboardCorners( image, boardSize, pointBuf, chessBoardFlags);
         
-        // Wait for a keystroke in the window
-        waitKey(0);
+        if(found){
+            Mat viewGray;
+            // Convert image to grey scale
+            cvtColor(image, viewGray, COLOR_BGR2GRAY);
+            // Use sub pixel interpolation to find more accurate corener estimates
+            cornerSubPix( viewGray, pointBuf, Size(11,11),
+                         Size(-1,-1), TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1 ));
+            // draw corners (Pointbuf) into image
+            //drawChessboardCorners( image, boardSize, Mat(pointBuf), found );
+            //imshow("Display Image", image);
+            
+            imagePoints.push_back(pointBuf);
+            
+        }
         
     }
+    
+    cout << "Found Corners for: "<< imagePoints.size()  << " images" << endl;
+    
+    // duplicate the object points (3D) for every 2D feature space
+    objectPoints.assign(imagePoints.size(), corners);
+    
+    // run calibration over feature sequences
+    rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
+    
+    cout << "Successfully Calibrated the Camera!\n";
+    cout << "RMS: " << rms << std::endl;
+    // Write to File
+    writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,rms);
+    
     
     
     return success;
