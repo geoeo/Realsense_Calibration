@@ -8,37 +8,44 @@
 
 #include "io.hpp"
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize,float rms){
+bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs, Size imageSize, const vector<string>& imagePaths,float rms){
     bool success = true;
     
     fstream fs;
     fs.open("intrinsics.txt", fstream::in | fstream::out | fstream::trunc);
-    fs << intrinsics.at<double>(0, 0) << "\n"; // fx
-    fs << intrinsics.at<double>(1, 1) << "\n"; // fy
-    fs << intrinsics.at<double>(0, 2) << "\n"; // ppx
-    fs << intrinsics.at<double>(1, 2) << "\n"; // ppy
+    fs << intrinsics.at<double>(0, 0) << endl; // fx
+    fs << intrinsics.at<double>(1, 1) << endl; // fy
+    fs << intrinsics.at<double>(0, 2) << endl; // ppx
+    fs << intrinsics.at<double>(1, 2) << endl; // ppy
     fs.close();
     
     fs.open("distortion.txt", fstream::in | fstream::out | fstream::trunc);
-    fs << distortion.at<double>(0,0) << "\n"; // k1
-    fs << distortion.at<double>(1,0) << "\n"; // k2
-    fs << distortion.at<double>(2,0) << "\n"; // p1
-    fs << distortion.at<double>(3,0) << "\n"; // p2
-    fs << distortion.at<double>(4,0) << "\n"; // k3
+    fs << distortion.at<double>(0,0) << endl; // k1
+    fs << distortion.at<double>(1,0) << endl; // k2
+    fs << distortion.at<double>(2,0) << endl; // p1
+    fs << distortion.at<double>(3,0) << endl; // p2
+    fs << distortion.at<double>(4,0) << endl; // k3
     fs.close();
     
     fs.open("dimensions.txt", fstream::in | fstream::out | fstream::trunc);
-    fs << imageSize.width << "\n"; // width
-    fs << imageSize.height << "\n"; // height
-    fs << rms << std::endl; // rms
+    fs << imageSize.width << endl; // width
+    fs << imageSize.height << endl; // height
+    fs << rms << endl; // rms
     fs.close();
     
     //TODO WRITE ALL
-    Mat tvec = tvecs[0]; // 3x1
     fs.open("tvec.txt", fstream::in | fstream::out | fstream::trunc);
-    fs << tvec.at<float>(0, 0) << "\n";
-    fs << tvec.at<float>(1, 0) << "\n";
-    fs << tvec.at<float>(2, 0) << "\n";
+    //Mat tvec = tvecs[0];
+    // 3x1: x,y,z
+    for(Mat tvec : tvecs){
+         fs << tvec.at<float>(0, 0) << "," << tvec.at<float>(1, 0) << "," << tvec.at<float>(2, 0) << endl;
+    }
+    fs.close();
+    
+    fs.open("imageOrder.txt", fstream::in | fstream::out | fstream::trunc);
+    for(string path : imagePaths){
+        fs << path << endl;
+    }
     fs.close();
     
     return success;

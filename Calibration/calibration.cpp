@@ -17,6 +17,8 @@ using namespace cv;
 float image_width = 640;
 float image_height = 480;
 float squareSize = 29.0; // in mm
+//float squareSize = 2.9; // in cm
+//float squareSize = 0.0029; // in meters
 //float squareSize = 1.0; // in mm
 // inner points per row, inner points per column
 Size boardSize = Size(7,5);
@@ -47,6 +49,8 @@ bool calibrationFromStream(){
     vector<vector<Point3f>> objectPoints;
     // vector of 2D feature points per image
     vector<vector<Point2f>> imagePoints;
+    // dummy vector
+    vector<string> imagePaths;
     
     bool capturing = false;
     
@@ -121,7 +125,7 @@ bool calibrationFromStream(){
             cout << "Successfully Calibrated the Camera!\n";
             cout << "RMS: " << rms << std::endl;
             // Write to File
-            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,rms);
+            writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,imagePaths,rms);
             
             break;
             
@@ -176,7 +180,7 @@ bool calibrationFromStream(){
     return success;
 }
 
-bool calibrationFromImageSequence(const vector<Mat>& images){
+bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths){
     bool success = true;
     
     //Wrap intrinsic paramters into openCV readable containers
@@ -218,7 +222,7 @@ bool calibrationFromImageSequence(const vector<Mat>& images){
     }
     
     // Create a window for display.
-    namedWindow( "Display window", WINDOW_AUTOSIZE );
+    //namedWindow( "Display window", WINDOW_AUTOSIZE );
     
     for(Mat image : images){
 
@@ -252,7 +256,7 @@ bool calibrationFromImageSequence(const vector<Mat>& images){
     cout << "Successfully Calibrated the Camera!\n";
     cout << "RMS: " << rms << std::endl;
     // Write to File
-    writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,rms);
+    writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs, imageSize,imagePaths, rms);
     
     
     

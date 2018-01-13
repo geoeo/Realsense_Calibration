@@ -22,6 +22,6 @@
 
 
 bool calibrationFromStream();
-bool calibrationFromImageSequence(const vector<Mat>& images);
+bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths);
 
 #endif /* calibration_hpp */
