@@ -23,8 +23,10 @@ int main()
     vector<Mat> images;
     vector<string> imagePaths;
     //string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images/";
-    string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Image_Seq_2/";
+    string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Image_Seq_1/";
     bool success = true;
+    // change this to calcuate rms for the default intrinsics on a given image set
+    bool useCameraDefaults = true;
 
     success = loadFilesInDirInto(imagePaths,dirPath);
     if(success)
@@ -32,7 +34,7 @@ int main()
     else
         return FAIL;
 
-    success = calibrationFromImageSequence(images,imagePaths);
+    success = calibrationFromImageSequence(images,imagePaths,useCameraDefaults);
     
 //    success = calibrationFromStream();
     

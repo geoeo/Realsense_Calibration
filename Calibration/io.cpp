@@ -48,7 +48,7 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
     fs.close();
     
     fs.open("rvec.txt", fstream::in | fstream::out | fstream::trunc);
-    // 3x1: Rodriguiz format
+    // 3x1: Rodriguiz format, https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
     for(Mat rvec : rvecs){
         fs << rvec.at<double>(0, 0) << "," << rvec.at<double>(1, 0) << "," << rvec.at<double>(2, 0) << endl;
     }

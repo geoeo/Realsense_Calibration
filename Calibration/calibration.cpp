@@ -182,7 +182,7 @@ bool calibrationFromStream(){
     return success;
 }
 
-bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths){
+bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths,bool useCameraDefaults){
     bool success = true;
     
     //Wrap intrinsic paramters into openCV readable containers
@@ -195,6 +195,7 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     vector<vector<Point3f>> objectPoints;
     // vector of 2D feature points per image
     vector<vector<Point2f>> imagePoints;
+    float totalError = 0;
     
     // defaults from camera
     float fx = 610.367; float fy = 615.825;
@@ -254,10 +255,27 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     // duplicate the object points (3D) for every 2D feature space
     objectPoints.assign(imagePoints.size(), corners);
     
-    // run calibration over feature sequences
-    rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
+    if(!useCameraDefaults){
+        // run calibration over feature sequences
+        rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
+    }
+    else{
+        rms = 0;
+        for (int i = 0; i < objectPoints.size(); i++) {
+            Mat rvec,tvec;
+            success = solvePnP(objectPoints[i], imagePoints[i], cameraMatrix, distCoeffs, rvec, tvec, false,SOLVEPNP_ITERATIVE);
+            if(!success)
+                return success;
+            rvecs.push_back(rvec);
+            tvecs.push_back(tvec);
+            vector<Point2f> imagePointsProjected;
+            projectPoints(objectPoints[i], rvec, tvec, cameraMatrix, distCoeffs, imagePointsProjected);
+            totalError += norm(imagePoints[i], imagePointsProjected,NORM_L2);
+        }
+        rms = sqrt(totalError/objectPoints.size());
+    }
+
     
-   
     removeRotationFromTranslation(rvecs,tvecs,tvecs_no_rot);
     
     cout << "Successfully Calibrated the Camera!\n";
