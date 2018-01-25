@@ -14,7 +14,7 @@
 
 // include project headers
 #include "calibration.hpp"
-#include "io.hpp"
+#include "definitions.hpp"
 
 
 int main()
@@ -22,9 +22,11 @@ int main()
     const int FAIL = 1;
     vector<Mat> images;
     vector<string> imagePaths;
-    //string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images/";
-    string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Image_Seq_1/";
-    bool success = true;
+    bool success;
+    string dirPath;
+    string root = returnRoot();
+
+    dirPath.append(root).append("Image_Seq_1/");
     // change this to calcuate rms for the default intrinsics on a given image set
     bool useCameraDefaults = true;
 

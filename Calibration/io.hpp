@@ -9,11 +9,14 @@
 #ifndef io_hpp
 #define io_hpp
 
-#include <stdio.h>
+//#include <stdio.h>
+#include <cstdio>
 #include <fstream>
 #include <ctime>
 #include <dirent.h>
 #include <opencv2/opencv.hpp>
+
+#include "definitions.hpp"
 
 using namespace std;
 using namespace cv;

@@ -10,16 +10,34 @@
 
 bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths,float rms){
     bool success = true;
-    
+
+
+    string root = returnRoot();
+    string intrinsicFilePath;
+    string distortionFilePath;
+    string dimensionFilePath;
+    string tvecFilePath;
+    string tvec_no_rotFilePath;
+    string rvecFilePath;
+    string imageOrderFilePath;
+
+    intrinsicFilePath.append(root).append("intrinsics.txt");
+    distortionFilePath.append(root).append("distortion.txt");
+    dimensionFilePath.append(root).append("dimension.txt");
+    tvecFilePath.append(root).append("tvec.txt");
+    tvec_no_rotFilePath.append(root).append("tvec_no_rot.txt");
+    rvecFilePath.append(root).append("rvec.txt");
+    imageOrderFilePath.append(root).append("imageOrder.txt");
+
     fstream fs;
-    fs.open("intrinsics.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(intrinsicFilePath, fstream::in | fstream::out | fstream::trunc);
     fs << intrinsics.at<double>(0, 0) << endl; // fx
     fs << intrinsics.at<double>(1, 1) << endl; // fy
     fs << intrinsics.at<double>(0, 2) << endl; // ppx
     fs << intrinsics.at<double>(1, 2) << endl; // ppy
     fs.close();
     
-    fs.open("distortion.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(distortionFilePath, fstream::in | fstream::out | fstream::trunc);
     fs << distortion.at<double>(0,0) << endl; // k1
     fs << distortion.at<double>(1,0) << endl; // k2
     fs << distortion.at<double>(2,0) << endl; // p1
@@ -27,34 +45,34 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
     fs << distortion.at<double>(4,0) << endl; // k3
     fs.close();
     
-    fs.open("dimensions.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(dimensionFilePath, fstream::in | fstream::out | fstream::trunc);
     fs << imageSize.width << endl; // width
     fs << imageSize.height << endl; // height
     fs << rms << endl; // rms
     fs.close();
     
-    fs.open("tvec.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(tvecFilePath, fstream::in | fstream::out | fstream::trunc);
     // 3x1: x,y,z
     for(Mat tvec : tvecs){
          fs << tvec.at<double>(0, 0) << "," << tvec.at<double>(1, 0) << "," << tvec.at<double>(2, 0) << endl;
     }
     fs.close();
     
-    fs.open("tvec_no_rot.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(tvec_no_rotFilePath, fstream::in | fstream::out | fstream::trunc);
     // 3x1: x,y,z
     for(Mat tvec : tvecs_no_rot){
         fs << tvec.at<double>(0, 0) << "," << tvec.at<double>(1, 0) << "," << tvec.at<double>(2, 0) << endl;
     }
     fs.close();
     
-    fs.open("rvec.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(rvecFilePath, fstream::in | fstream::out | fstream::trunc);
     // 3x1: Rodriguiz format, https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
     for(Mat rvec : rvecs){
         fs << rvec.at<double>(0, 0) << "," << rvec.at<double>(1, 0) << "," << rvec.at<double>(2, 0) << endl;
     }
     fs.close();
     
-    fs.open("imageOrder.txt", fstream::in | fstream::out | fstream::trunc);
+    fs.open(imageOrderFilePath, fstream::in | fstream::out | fstream::trunc);
     for(string path : imagePaths){
         fs << path << endl;
     }

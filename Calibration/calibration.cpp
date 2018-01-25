@@ -25,7 +25,7 @@ Size boardSize = Size(7,5);
 Size imageSize = Size(image_width,image_height);
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int calibrationFlags = CV_CALIB_USE_INTRINSIC_GUESS | CV_CALIB_FIX_ASPECT_RATIO; // | CV_CALIB_FIX_FOCAL_LENGTH;
-float rms = 0;
+double rms = 0;
 
 bool calibrationFromStream(){
     bool success = true;
