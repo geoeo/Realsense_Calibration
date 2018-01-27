@@ -59,7 +59,7 @@ int main()
     string root = returnRoot();
     string imagePath;
 
-    imagePath.append(root).append("Image_Seq_1/").append("image_21.png");
+    imagePath.append(root).append("Image_Seq_1/").append("image_52.png");
     dirPath.append(root).append("Image_Seq_1/");
     
     // change this to calibrate the camera on a given image set
