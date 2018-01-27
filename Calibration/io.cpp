@@ -8,9 +8,7 @@
 
 #include "io.hpp"
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths,float rms){
-    bool success = true;
-
+void writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths,float rms){
 
     string root = returnRoot();
     string intrinsicFilePath;
@@ -77,8 +75,7 @@ bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,con
         fs << path << endl;
     }
     fs.close();
-    
-    return success;
+
     
 }
 
@@ -128,10 +125,65 @@ bool loadImages(const vector<string> &imagePaths, vector<Mat>& images){
         images.push_back(image);
         
     }
-    
 
-    
-    
     return success;
+    
+}
+
+void loadIntrinsicsInto(Mat& intrinsics, Mat& distortion, const string folder){
+    
+    string root = returnRoot();
+    string intrinsicFilePath;
+    string distortionFilePath;
+    char lineRaw[255];
+    vector<double> intrinsicsVector; // fx,fy, ppx, ppy
+    vector<double> distortionVector; // k1, k2, p1, p2, k3.
+    
+    intrinsicFilePath.append(root).append(folder).append("intrinsics.txt");
+    distortionFilePath.append(root).append(folder).append("distortion.txt");
+    
+    fstream fs;
+    
+    fs.open(intrinsicFilePath, fstream::in);
+    cout << "Reading Intrinsics from File.." << endl;
+    
+    while(fs){
+        fs.getline(lineRaw, 255);
+        string line(lineRaw);
+        if(line.empty())
+            break;
+        cout << line << endl;
+        double val = atof(lineRaw);
+        intrinsicsVector.push_back(val);
+        
+    }
+    fs.close();
+    
+    fs.open(distortionFilePath, fstream::in);
+    cout << "Reading Distortion Coeffs from File.." << endl;
+    
+    while(fs){
+        fs.getline(lineRaw, 255);
+        string line(lineRaw);
+        if(line.empty())
+            break;
+        cout << line << endl;
+        double val = atof(lineRaw);
+        distortionVector.push_back(val);
+    }
+    fs.close();
+    
+    intrinsics.at<double>(0,0) = intrinsicsVector.at(0);
+    intrinsics.at<double>(1,1) = intrinsicsVector.at(1);
+    intrinsics.at<double>(0,2) = intrinsicsVector.at(2);
+    intrinsics.at<double>(1,2) = intrinsicsVector.at(3);
+    
+    distortion.at<double>(0,0) = distortionVector.at(0);
+    distortion.at<double>(1,0) = distortionVector.at(1);
+    distortion.at<double>(2,0) = distortionVector.at(2);
+    distortion.at<double>(3,0) = distortionVector.at(3);
+    distortion.at<double>(4,0) = distortionVector.at(4);
+    
+    
     
 }

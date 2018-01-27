@@ -21,6 +21,10 @@ int main()
 {
     const int FAIL = 1;
     vector<Mat> images;
+    Mat intrinsics = Mat::eye(3, 3, CV_64F);
+    Mat distortion = Mat::zeros(5, 1, CV_64F);;
+    
+    string intrinsicsFolder = "Calibration_Output/defaults/";
     vector<string> imagePaths;
     bool success;
     string dirPath;
@@ -28,15 +32,17 @@ int main()
 
     dirPath.append(root).append("Image_Seq_1/");
     // change this to calcuate rms for the default intrinsics on a given image set
-    bool useCameraDefaults = true;
+    bool useSuppliedParamters = true;
 
     success = loadFilesInDirInto(imagePaths,dirPath);
     if(success)
         loadImages(imagePaths,images);
     else
         return FAIL;
+    
+    loadIntrinsicsInto(intrinsics, distortion, intrinsicsFolder);
 
-    success = calibrationFromImageSequence(images,imagePaths,useCameraDefaults);
+    success = calibrationFromImageSequence(images,imagePaths,useSuppliedParamters,intrinsics,distortion);
     
 //    success = calibrationFromStream();
     

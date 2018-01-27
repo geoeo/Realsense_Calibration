@@ -182,13 +182,9 @@ bool calibrationFromStream(){
     return success;
 }
 
-bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths,bool useCameraDefaults){
+bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths,bool useSuppliedParameters, const Mat& cameraMatrix, const Mat& distCoeffs){
     bool success = true;
     
-    //Wrap intrinsic paramters into openCV readable containers
-    Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
-    Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
-    //Mat cameraMatrix = Mat::zeros(3, 3, CV_32F);
     // Vector for image series
     vector<Mat> rvecs, tvecs, tvecs_no_rot;
     // vector of 3D feature points per image
@@ -196,21 +192,6 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     // vector of 2D feature points per image
     vector<vector<Point2f>> imagePoints;
     float totalError = 0;
-    
-    // defaults from camera
-    float fx = 610.367; float fy = 615.825;
-    float ppx = 332.213; float ppy = 225.817;
-
-    cameraMatrix.at<double>(0, 0) = fx;
-    cameraMatrix.at<double>(1, 1) = fy;
-    cameraMatrix.at<double>(0, 2) = ppx;
-    cameraMatrix.at<double>(1, 2) = ppy;
-    
-    distCoeffs.at<double>(0,0) = -0.0658501;
-    distCoeffs.at<double>(1,0) = 0.0744128;
-    distCoeffs.at<double>(2,0) = -0.000177425;
-    distCoeffs.at<double>(3,0) = -0.00126745;
-    distCoeffs.at<double>(4,0) = 0;
 
     // vector of 2D features
     vector<Point2f> pointBuf;
@@ -255,7 +236,7 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     // duplicate the object points (3D) for every 2D feature space
     objectPoints.assign(imagePoints.size(), corners);
     
-    if(!useCameraDefaults){
+    if(!useSuppliedParameters){
         // run calibration over feature sequences
         rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
     }

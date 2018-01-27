@@ -21,10 +21,12 @@
 using namespace std;
 using namespace cv;
 
-bool writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths, float rms);
+void writeCalibrationDataToDisk(const Mat& intrinsics, const Mat& distortion,const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rot, Size imageSize, const vector<string>& imagePaths, float rms);
 
 bool loadImages(const vector<string> &imagePaths,vector<Mat>& images);
 
 bool loadFilesInDirInto(vector<string> &imagePaths,string dirPath);
+
+void loadIntrinsicsInto(Mat& intrinsics, Mat& distortion,const string folder);
 
 #endif /* io_hpp */
