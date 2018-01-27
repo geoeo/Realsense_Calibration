@@ -191,7 +191,6 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     vector<vector<Point3f>> objectPoints;
     // vector of 2D feature points per image
     vector<vector<Point2f>> imagePoints;
-    float totalError = 0;
 
     // vector of 2D features
     vector<Point2f> pointBuf;
@@ -241,19 +240,8 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
         rms = calibrateCamera(objectPoints, imagePoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs,calibrationFlags);
     }
     else{
-        rms = 0;
-        for (int i = 0; i < objectPoints.size(); i++) {
-            Mat rvec,tvec;
-            success = solvePnP(objectPoints[i], imagePoints[i], cameraMatrix, distCoeffs, rvec, tvec, false,SOLVEPNP_ITERATIVE);
-            if(!success)
-                return success;
-            rvecs.push_back(rvec);
-            tvecs.push_back(tvec);
-            vector<Point2f> imagePointsProjected;
-            projectPoints(objectPoints[i], rvec, tvec, cameraMatrix, distCoeffs, imagePointsProjected);
-            totalError += norm(imagePoints[i], imagePointsProjected,NORM_L2);
-        }
-        rms = sqrt(totalError/objectPoints.size());
+        // rms is calculated in this function
+        success = calculateCameraParameters(objectPoints,imagePoints,cameraMatrix,distCoeffs,rvecs,tvecs);
     }
 
     
@@ -265,6 +253,27 @@ bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string
     writeCalibrationDataToDisk(cameraMatrix, distCoeffs, rvecs, tvecs,tvecs_no_rot,imageSize,imagePaths, rms);
     
     
+    
+    return success;
+}
+
+bool calculateCameraParameters(vector<vector<Point3f>>& objectPoints,vector<vector<Point2f>>& imagePoints,const Mat& cameraMatrix, const Mat& distCoeffs,vector<Mat>& rvecs,vector<Mat>& tvecs){
+    bool success = true;
+    float totalError = 0;
+    
+    rms = 0;
+    for (int i = 0; i < objectPoints.size(); i++) {
+        Mat rvec,tvec;
+        success = solvePnP(objectPoints[i], imagePoints[i], cameraMatrix, distCoeffs, rvec, tvec, false,SOLVEPNP_ITERATIVE);
+        if(!success)
+            return success;
+        rvecs.push_back(rvec);
+        tvecs.push_back(tvec);
+        vector<Point2f> imagePointsProjected;
+        projectPoints(objectPoints[i], rvec, tvec, cameraMatrix, distCoeffs, imagePointsProjected);
+        totalError += norm(imagePoints[i], imagePointsProjected,NORM_L2);
+    }
+    rms = sqrt(totalError/objectPoints.size());
     
     return success;
 }

@@ -24,5 +24,6 @@
 bool calibrationFromStream();
 bool calibrationFromImageSequence(const vector<Mat>& images, const vector<string>& imagePaths,bool useSuppliedParameters, const Mat& cameraMatrix, const Mat& distCoeffs);
 void removeRotationFromTranslation(const vector<Mat>& rvecs,const vector<Mat>& tvecs,vector<Mat>& tvecs_no_rotation);
+bool calculateCameraParameters(vector<vector<Point3f>>& objectPoints,vector<vector<Point2f>>& imagePoints,const Mat& cameraMatrix, const Mat& distCoeffs,vector<Mat>& rvecs,vector<Mat>& tvecs);
 
 #endif /* calibration_hpp */
