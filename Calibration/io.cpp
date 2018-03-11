@@ -106,11 +106,13 @@ bool loadFilesInDirInto(vector<string> &imagePaths,string dirPath){
 
 }
 
-bool loadImages(const vector<string> &imagePaths, vector<Mat>& images){
+bool loadImages(const vector<string> &imagePaths, vector<Mat>& images, int offset){
     
     bool success = true;
     
-    for(string imagePath : imagePaths){
+    //for(string imagePath : imagePaths){
+    for(int i = 0; i < imagePaths.size(); i+=offset){
+        string imagePath = imagePaths[i];
         // Read the file
         Mat image = imread(imagePath, CV_LOAD_IMAGE_COLOR);
         

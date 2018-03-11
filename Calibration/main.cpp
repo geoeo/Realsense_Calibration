@@ -18,11 +18,11 @@
 
 const int FAIL = 1;
 
-int loadAllImagesFromDir(const string dirPath, vector<string>& imagePaths, vector<Mat>& images){
+int loadAllImagesFromDir(const string dirPath, vector<string>& imagePaths, vector<Mat>& images,int offset){
     
     bool success = loadFilesInDirInto(imagePaths,dirPath);
     if(success)
-        loadImages(imagePaths,images);
+        loadImages(imagePaths,images,offset);
     else
         return FAIL;
     
@@ -34,7 +34,7 @@ int loadSingleImageFromDir(string imagePath,vector<string>& imagePaths, vector<M
     
     imagePaths.push_back(imagePath);
     
-    if(!loadImages(imagePaths,images))
+    if(!loadImages(imagePaths,images,1))
        return FAIL;
 
 
@@ -50,8 +50,8 @@ int main()
     Mat intrinsics = Mat::eye(3, 3, CV_64F);
     Mat distortion = Mat::zeros(5, 1, CV_64F);;
     
-    //string intrinsicsFolder = "Calibration_Output/defaults/";
-    string intrinsicsFolder = "Calibration_Output/Seq_1/";
+    string intrinsicsFolder = "Calibration_Output/defaults/";
+//    string intrinsicsFolder = "Calibration_Output/Seq_4/";
     
     vector<string> imagePaths;
     bool success;
@@ -59,19 +59,19 @@ int main()
     string root = returnRoot();
     string imagePath;
 
-    imagePath.append(root).append("Image_Seq_1/").append("image_52.png");
-    dirPath.append(root).append("Image_Seq_1/");
+    //imagePath.append(root).append("Image_Seq_1/").append("image_52.png");
+    dirPath.append(root).append("Image_Seq_8/");
     
     // change this to calibrate the camera on a given image set
-    bool useSuppliedParamters = true;
+    bool useSuppliedParamters = false;
 
 //    //Used for calibration
-//    if(loadAllImagesFromDir(dirPath,imagePaths,images) == FAIL)
-//        return FAIL;
+    if(loadAllImagesFromDir(dirPath,imagePaths,images,10) == FAIL)
+        return FAIL;
     
     // Used to estimate camera extrinsics for single image
-    if(loadSingleImageFromDir(imagePath,imagePaths, images) == FAIL)
-        return FAIL;
+//    if(loadSingleImageFromDir(imagePath,imagePaths, images) == FAIL)
+//        return FAIL;
     
     loadIntrinsicsInto(intrinsics, distortion, intrinsicsFolder);
 
