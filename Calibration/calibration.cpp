@@ -59,16 +59,16 @@ bool calibrationFromStream(){
     cout << "fx:" << intrinsics.fx << " fy:" << intrinsics.fy << "\n";
     cout << "ppx:" << intrinsics.ppx << " ppy:" << intrinsics.ppy << "\n";
     
-    cameraMatrix.at<double>(0, 0) = intrinsics.fx; // 610.367
-    cameraMatrix.at<double>(1, 1) = intrinsics.fy; // 615.825
-    cameraMatrix.at<double>(0, 2) = intrinsics.ppx; // 332.213
-    cameraMatrix.at<double>(1, 2) = intrinsics.ppy; // 225.817
+    cameraMatrix.at<double>(0, 0) = intrinsics.fx; // RS200: 610.367 / ZR300: 612.132
+    cameraMatrix.at<double>(1, 1) = intrinsics.fy; // RS200: 615.825 / ZR300: 611.747
+    cameraMatrix.at<double>(0, 2) = intrinsics.ppx; // RS200: 332.213 / ZR300: 320.787
+    cameraMatrix.at<double>(1, 2) = intrinsics.ppy; // RS200: 225.817 /ZR300: 242.379
     
-//    Distortion Coeff 0:-0.0658501
-//    Distortion Coeff 1:0.0744128
-//    Distortion Coeff 2:-0.000177425
-//    Distortion Coeff 3:-0.00126745
-//    Distortion Coeff 4:0
+    //    Distortion Coeff RS200: 0:-0.0658501 / ZR300: 0.0596815
+    //    Distortion Coeff RS200: 1:0.0744128 / ZR300: -0.11851
+    //    Distortion Coeff RS200: 2:-0.000177425 / ZR300: 0.000586641
+    //    Distortion Coeff RS200: 3:-0.00126745 / ZR300: 0.00288586
+    //    Distortion Coeff RS200: 4:0 / ZR300: 0
     cout << "Distortion model:" << intrinsics.model << "\n";
     for (int i = 0; i < 5; i++) {
         double coeff = intrinsics.coeffs[i];

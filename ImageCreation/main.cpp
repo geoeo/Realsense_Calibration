@@ -22,7 +22,8 @@ float image_width = 640;
 float image_height = 480;
 Size boardSize = Size(7,5);
 bool capturing = false;
-string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images/";
+//string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images/";
+string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images_ZR300/";
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int imageCounter = 1;
 
