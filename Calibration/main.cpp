@@ -53,6 +53,7 @@ int main()
 //    string intrinsicsFolder = "Calibration_Output/defaults/";
     //string intrinsicsFolder = "Calibration_Output/Seq_1/";
     string intrinsicsFolder = "Calibration_Output_ZR300/defaults/";
+    //string intrinsicsFolder = "Calibration_Output_ZR300/Seq_2/";
     
     vector<string> imagePaths;
     bool success;
@@ -62,25 +63,27 @@ int main()
 
     //imagePath.append(root).append("Image_Seq_1/").append("image_52.png");
     //imagePath.append(root).append("robot_measure/").append("97-8.png");
+    //imagePath.append(root).append("ZR300_Image_Seq_1/").append("image_5.png");
 //    dirPath.append(root).append("Image_Seq_10/");
-    dirPath.append(root).append("ZR300_Image_Seq_2/");
+    dirPath.append(root).append("ZR300_Image_Seq_1/");
     
-    // change this to calibrate the camera on a given image set
-    bool useSuppliedParamters = true;
 
 //    //Used for calibration
     if(loadAllImagesFromDir(dirPath,imagePaths,images,1) == FAIL)
         return FAIL;
-    cout << "Loaded Images"<< "\n";
     
     // Used to estimate camera extrinsics for single image
-//    if(loadSingleImageFromDir(imagePath,imagePaths, images) == FAIL)
-//        return FAIL;
+    //if(loadSingleImageFromDir(imagePath,imagePaths, images) == FAIL)
+    //    return FAIL;
+    
+    cout << "Loaded Images"<< "\n";
     
     // Reads already stored instrinsic values
     loadIntrinsicsInto(intrinsics, distortion, intrinsicsFolder);
     cout << "Loaded Intrinsics"<< "\n";
 
+    // change this to calibrate the camera on a given image set
+    bool useSuppliedParamters = false;
     success = calibrationFromImageSequence(images,imagePaths,useSuppliedParamters,intrinsics,distortion);
     
     //success = calibrationFromStream();
