@@ -26,6 +26,7 @@ bool capturing = false;
 string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images_ZR300/";
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int imageCounter = 1;
+bool detectCorners = false; // flag to determine if conrers should be detected or all images should be saved
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -77,32 +78,35 @@ int main(int argc, const char * argv[]) {
             if(keyPressed == 'c')
                 capturing = !capturing;
             
-            bool found = findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags);
+            bool found = detectCorners? findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags) : true;
             
             if(found){
-                Mat viewGray;
-                // Convert image to grey scale
-                cvtColor(view, viewGray, COLOR_BGR2GRAY);
-                // Use sub pixel interpolation to find more accurate corener estimates
-                cornerSubPix( viewGray, pointBuf, Size(11,11),
-                             Size(-1,-1), TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1 ));
-                // draw corners (Pointbuf) into image
-                drawChessboardCorners( viewGray, boardSize, Mat(pointBuf), found );
-                imshow("Display Image", viewGray);
+                if(detectCorners){
+                    Mat viewGray;
+                    // Convert image to grey scale
+                    cvtColor(view, viewGray, COLOR_BGR2GRAY);
+                    // Use sub pixel interpolation to find more accurate corener estimates
+                    cornerSubPix( viewGray, pointBuf, Size(11,11),
+                                 Size(-1,-1), TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1 ));
+                    // draw corners (Pointbuf) into image
+                    drawChessboardCorners( viewGray, boardSize, Mat(pointBuf), found );
+                    imshow("Display Image", viewGray);
+                }
+                else{
+                        imshow("Display Image", view);
+                }
+
                 
-                // Enter
-                //if(keyPressed == 13){
-                    try {
-                        string imageName(dirPath + "image_" + std::to_string(imageCounter)+".png");
-                        imwrite(imageName, view, compression_params);
-                        cout << imageName << " saved to disk" << std::endl;
-                        imageCounter++;
-                    }
-                    catch (runtime_error& ex) {
-                        fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
-                        return 1;
-                    }
-                //}
+                try {
+                    string imageName(dirPath + "image_" + std::to_string(imageCounter)+".png");
+                    imwrite(imageName, view, compression_params);
+                    cout << imageName << " saved to disk" << std::endl;
+                    imageCounter++;
+                }
+                catch (runtime_error& ex) {
+                    fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
+                    return 1;
+                }
             }
             else {
                 imshow("Display Image", view);
