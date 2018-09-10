@@ -27,6 +27,14 @@ string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images_ZR30
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int imageCounter = 1;
 bool detectCorners = false; // flag to determine if conrers should be detected or all images should be saved
+string depthScaleFilePath = dirPath.append("depthScale.txt");
+fstream fs;
+
+rs::stream colorStream = rs::stream::color;
+rs::stream depthStream = rs::stream::depth;
+rs::stream depthAlignedToRectifiedColorStream = rs::stream::depth_aligned_to_rectified_color;
+rs::stream colorRectifiedStream = rs::stream::rectified_color;
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -37,7 +45,9 @@ int main(int argc, const char * argv[]) {
     rs::device * dev = ctx.get_device(0);
     
     // Configure Infrared stream to run at VGA resolution at 30 frames per second
-    dev->enable_stream(rs::stream::color, image_width, image_height, rs::format::bgr8, 30);
+    //dev->enable_stream(rs::stream::color, image_width, image_height, rs::format::bgr8, 30);
+    dev->enable_stream(colorStream, image_width, image_height, rs::format::bgr8, 30);
+    dev->enable_stream(depthStream, image_width, image_height, rs::format::z16, 30);
     
     // Start streaming
     dev->start();
@@ -56,10 +66,14 @@ int main(int argc, const char * argv[]) {
     vector<int> compression_params;
     compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
     
+    fs.open(depthScaleFilePath, fstream::in | fstream::out | fstream::trunc);
+    
     while(true){
         
         // Creating OpenCV Matrix from a color image
-        Mat view(Size(image_width, image_height), CV_8UC3, (void*)dev->get_frame_data(rs::stream::color), Mat::AUTO_STEP);
+        Mat view(Size(image_width, image_height), CV_8UC3, (void*)dev->get_frame_data(colorRectifiedStream), Mat::AUTO_STEP);
+        Mat viewDepth(Size(image_width, image_height), CV_16U, (void*)dev->get_frame_data(depthAlignedToRectifiedColorStream), Mat::AUTO_STEP);
+        float depth_scale = dev->get_depth_scale();
         
         char keyPressed = (char)waitKey(1);
         //cout << "Key pressed: " << (int)keyPressed << "\n";
@@ -69,6 +83,7 @@ int main(int argc, const char * argv[]) {
             cout << "Exiting..\n";
             dev->stop();
             ctx.~context();
+            fs.close();
             break;
         }
         
@@ -78,7 +93,7 @@ int main(int argc, const char * argv[]) {
             if(keyPressed == 'c')
                 capturing = !capturing;
             
-            bool found = detectCorners? findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags) : true;
+            bool found = detectCorners ? findChessboardCorners( view, boardSize, pointBuf, chessBoardFlags) : true;
             
             if(found){
                 if(detectCorners){
@@ -98,13 +113,21 @@ int main(int argc, const char * argv[]) {
 
                 
                 try {
-                    string imageName(dirPath + "image_" + std::to_string(imageCounter)+".png");
+                    string imageCounterString = std::to_string(imageCounter);
+                    string imageName(dirPath + "image_" + imageCounterString +".png");
+                    string imageNameDepth(dirPath + "image_depth_" + imageCounterString +".png");
+                    
                     imwrite(imageName, view, compression_params);
+                    imwrite(imageNameDepth, viewDepth, compression_params);
+                    fs << depth_scale << endl;
                     cout << imageName << " saved to disk" << std::endl;
                     imageCounter++;
                 }
                 catch (runtime_error& ex) {
                     fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
+                    dev->stop();
+                    ctx.~context();
+                    fs.close();
                     return 1;
                 }
             }
