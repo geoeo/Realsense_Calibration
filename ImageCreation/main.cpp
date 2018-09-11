@@ -27,12 +27,13 @@ string dirPath = "/Users/marchaubenstock/Workspace/Xcode/Calibration/Images_ZR30
 int chessBoardFlags = CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE;
 int imageCounter = 1;
 bool detectCorners = false; // flag to determine if conrers should be detected or all images should be saved
-string depthScaleFilePath = dirPath.append("depthScale.txt");
+string depthScaleFilePath;
 fstream fs;
 
 rs::stream colorStream = rs::stream::color;
 rs::stream depthStream = rs::stream::depth;
 rs::stream depthAlignedToRectifiedColorStream = rs::stream::depth_aligned_to_rectified_color;
+rs::stream depthAlignedTColorStream = rs::stream::depth_aligned_to_color;
 rs::stream colorRectifiedStream = rs::stream::rectified_color;
 
 
@@ -66,14 +67,21 @@ int main(int argc, const char * argv[]) {
     vector<int> compression_params;
     compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
     
+    depthScaleFilePath.append(dirPath).append("depthScale.txt");
     fs.open(depthScaleFilePath, fstream::in | fstream::out | fstream::trunc);
     
     while(true){
         
         // Creating OpenCV Matrix from a color image
-        Mat view(Size(image_width, image_height), CV_8UC3, (void*)dev->get_frame_data(colorRectifiedStream), Mat::AUTO_STEP);
-        Mat viewDepth(Size(image_width, image_height), CV_16U, (void*)dev->get_frame_data(depthAlignedToRectifiedColorStream), Mat::AUTO_STEP);
+        Mat view(Size(image_width, image_height), CV_8UC3, (void*)dev->get_frame_data(colorStream), Mat::AUTO_STEP);
+        Mat viewDepthAligned(Size(image_width, image_height), CV_16U, (void*)dev->get_frame_data(depthAlignedTColorStream), Mat::AUTO_STEP);
+        //Mat viewDepth(Size(image_width, image_height), CV_16U, (void*)dev->get_frame_data(depthStream), Mat::AUTO_STEP);
         float depth_scale = dev->get_depth_scale();
+        
+        viewDepthAligned = viewDepthAligned * depth_scale;
+        //viewDepth = viewDepth * depth_scale;
+        
+        //rs::extrinsics extrinsics = dev->get_extrinsics(depthStream, colorStream);
         
         char keyPressed = (char)waitKey(1);
         //cout << "Key pressed: " << (int)keyPressed << "\n";
@@ -105,10 +113,14 @@ int main(int argc, const char * argv[]) {
                                  Size(-1,-1), TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 30, 0.1 ));
                     // draw corners (Pointbuf) into image
                     drawChessboardCorners( viewGray, boardSize, Mat(pointBuf), found );
-                    imshow("Display Image", viewGray);
+                    imshow("Display Image", view);
+                    //imshow("Display Image Depth", viewDepth);
+                    //imshow("Display Image Depth Aligned", viewDepthAligned);
                 }
                 else{
                         imshow("Display Image", view);
+                        //imshow("Display Image Depth", viewDepth);
+                        //imshow("Display Image Depth Aligned", viewDepthAligned);
                 }
 
                 
@@ -116,9 +128,12 @@ int main(int argc, const char * argv[]) {
                     string imageCounterString = std::to_string(imageCounter);
                     string imageName(dirPath + "image_" + imageCounterString +".png");
                     string imageNameDepth(dirPath + "image_depth_" + imageCounterString +".png");
+                    string imageNameDepthAligned(dirPath + "image_depth_aligned_" + imageCounterString +".png");
                     
                     imwrite(imageName, view, compression_params);
-                    imwrite(imageNameDepth, viewDepth, compression_params);
+                    //imwrite(imageNameDepth, viewDepth, compression_params);
+                    imwrite(imageNameDepthAligned, viewDepthAligned, compression_params);
+
                     fs << depth_scale << endl;
                     cout << imageName << " saved to disk" << std::endl;
                     imageCounter++;
@@ -133,6 +148,8 @@ int main(int argc, const char * argv[]) {
             }
             else {
                 imshow("Display Image", view);
+                //imshow("Display Image Depth", viewDepth);
+                imshow("Display Image Depth Aligned", viewDepthAligned);
                 capturing = false;
             }
             
@@ -140,6 +157,8 @@ int main(int argc, const char * argv[]) {
         
         else{
             imshow("Display Image", view);
+            //imshow("Display Image Depth", viewDepth);
+            imshow("Display Image Depth Aligned", viewDepthAligned);
         }
         
         dev->wait_for_frames();
